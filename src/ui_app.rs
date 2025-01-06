@@ -2,12 +2,12 @@ use eframe::egui;
 use std::path::PathBuf;
 use egui_file_dialog::FileDialog;
 
-use crate::dispatcher;
+use crate::dispatcher::Dispatcher;
 
 pub struct UIApp {
     file_dialog: FileDialog,
     picked_file: Option<PathBuf>,            
-    ip_address: String,
+    address: String,
 }
 
 impl Default for UIApp {
@@ -15,7 +15,7 @@ impl Default for UIApp {
         Self {
             file_dialog: FileDialog::new(),
             picked_file: None,
-            ip_address: "127.0.0.1".to_string(),
+            address: "127.0.0.1:3000".to_string(),
         }
     }
 }
@@ -25,7 +25,7 @@ impl eframe::App for UIApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.horizontal(|ui|{
                 ui.label("Enter IP of target device: ");
-                ui.text_edit_singleline(&mut  self.ip_address);          
+                ui.text_edit_singleline(&mut  self.address);          
             });
            if ui.button("Pick file").clicked() {
                 self.file_dialog.pick_file();
@@ -36,7 +36,10 @@ impl eframe::App for UIApp {
                 self.picked_file = Some(path.to_path_buf());
             }
             if ui.button("Play sound").clicked() {
-                dispatcher::Dispatcher::handle_dispatch_sample();
+                if let Some(path) = &self.picked_file {
+                    Dispatcher::handle_dispatch_sample(self.address.clone(), path.to_str().unwrap().to_owned());
+
+                }
             }
         });
     }

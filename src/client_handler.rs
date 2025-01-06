@@ -22,7 +22,7 @@ impl ClientHandler {
     }
 
     pub fn listen() {
-        let listener = TcpListener::bind("127.0.0.1:3000").expect("Could not bind to address");
+        let listener = TcpListener::bind("0.0.0.0:3000").expect("Could not bind to address");
 
         for stream in listener.incoming() {
             thread::spawn(move || match stream {
