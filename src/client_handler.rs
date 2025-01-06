@@ -2,6 +2,7 @@ use crate::protocol::Message;
 use crate::sound_scheduler::SoundScheduler;
 use std::io::Read;
 use std::net::{TcpListener, TcpStream};
+use std::thread;
 
 pub struct ClientHandler;
 
@@ -24,14 +25,14 @@ impl ClientHandler {
         let listener = TcpListener::bind("127.0.0.1:3000").expect("Could not bind to address");
 
         for stream in listener.incoming() {
-            match stream {
+            thread::spawn(move || match stream {
                 Ok(stream) => {
                     ClientHandler::handle_client(stream);
                 }
                 Err(e) => {
                     eprintln!("Error: {}", e);
                 }
-            }
+            });
         }
     }
 }
