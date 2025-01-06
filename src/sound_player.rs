@@ -1,13 +1,12 @@
 use rodio::{Decoder, OutputStream, Sink};
-use std::{fs::File, io::BufReader};
+use std::io::Cursor;
 
 pub struct SoundPlayer;
 
 impl SoundPlayer {
-    pub fn play_sound(sound_source: String) {
-        let path = format!("./audios/{}", sound_source);
-        let file = BufReader::new(File::open(path).unwrap());
-        let source = Decoder::new(file).unwrap();
+    pub fn play_sound(sound_data: Vec<u8>) {
+        let data = Cursor::new(sound_data);
+        let source = Decoder::new(data).unwrap();
 
         let (_stream, stream_handle) = OutputStream::try_default().unwrap();
         let sink = Sink::try_new(&stream_handle).unwrap();

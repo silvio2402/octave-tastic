@@ -8,10 +8,10 @@ pub struct SoundScheduler;
 impl SoundScheduler {
     pub fn handle_scheduled_sound(play_msg: PlaySound) {
         let PlaySound {
-            sound_source,
+            sound_data,
             timestamp,
         } = play_msg;
-        println!("Scheduled sound: {:?} at {:?}", sound_source, timestamp);
+        println!("Scheduled sound: len={:?} at {:?}", sound_data.len(), timestamp);
         let now_micros = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("Could not get time")
@@ -22,7 +22,7 @@ impl SoundScheduler {
             return;
         }
         sleep(Duration::from_micros(wait as u64));
-        println!("Playing sound: {:?}", sound_source);
-        SoundPlayer::play_sound(sound_source);
+        println!("Playing sound...");
+        SoundPlayer::play_sound(sound_data);
     }
 }

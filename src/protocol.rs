@@ -8,5 +8,5 @@ pub enum Message {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PlaySound {
     pub timestamp: u128,
-    pub sound_source: String,
+    pub sound_data: Vec<u8>,
 }
