@@ -9,13 +9,13 @@ impl NetworkDispatcher {
         Self {}
     }
 
-    pub fn dispatch_sound(&self, addr: String, timestamp: u64, sound_source: String) {
+    pub fn dispatch_sound(&self, addr: String, timestamp: u128, sound_source: String) -> std::io::Result<()> {
         let msg = Message::PlaySound(PlaySound {
             timestamp: timestamp,
             sound_source: sound_source,
         });
         let mut sock = TcpStream::connect(addr).expect("Failed to connect");
         let buf = bincode::serialize(&msg).expect("Failed to serialize");
-        sock.write_all(&buf);
+        sock.write_all(&buf)
     }
 }

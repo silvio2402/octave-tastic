@@ -7,6 +7,6 @@ pub enum Message {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PlaySound {
-    pub timestamp: u64,
+    pub timestamp: u128,
     pub sound_source: String,
 }
