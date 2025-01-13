@@ -1,41 +1,60 @@
-use std::io::{BufReader, Read};
+use std::io::BufReader;
 use std::net::TcpStream;
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
 use std::{fs::File, io::Write};
+
+use rodio::{Decoder, Source};
 
 use crate::protocol::{Message, PlaySound};
 
 pub struct Dispatcher;
 
 impl Dispatcher {
-    fn load_sound(path: String) -> Vec<u8> {
+    fn load_sound(path: String) -> Decoder<BufReader<File>> {
         let file = BufReader::new(File::open(path).unwrap());
-        let data: Vec<u8> = file.bytes().map(|byte| byte.unwrap()).collect();
-        data
+        Decoder::new(file).unwrap()
     }
 
     pub fn handle_dispatch_sample(addrs: Vec<String>, sound_path: String) {
         let now = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_micros();
-        let timestamp = now + 10000000;
-        let sound_data = Dispatcher::load_sound(sound_path);
-        let msg = Message::PlaySound(PlaySound {
-            timestamp: timestamp,
-            sound_data: sound_data,
-        });
+            .unwrap();
+
+        let source = Dispatcher::load_sound(sound_path).buffered();
+
+        let channels = source.channels();
+        let sample_rate = source.sample_rate();
+        let duration = source.total_duration().unwrap();
+        let chunk_len = Duration::from_secs(1);
+
+        let mut offset = Duration::from_secs(0);
+
         for addr in addrs {
             if addr.is_empty() {
                 continue;
-                
-            } else {
-                let mut sock = TcpStream::connect(addr).expect("Failed to connect");
+            }
+
+            let mut sock = TcpStream::connect(addr).expect("Failed to connect");
+
+            while offset < duration {
+                let sound_data = source
+                    .clone()
+                    .skip_duration(offset)
+                    .take_duration(chunk_len)
+                    .collect::<Vec<i16>>();
+
+                offset += chunk_len;
+
+                let msg = Message::PlaySound(PlaySound {
+                    timestamp: (now + offset).as_micros(),
+                    channels: channels,
+                    sample_rate: sample_rate,
+                    sound_data: sound_data,
+                });
+
                 let buf = bincode::serialize(&msg).expect("Failed to serialize");
                 sock.write_all(&buf).unwrap();
             }
-            
         }
-        
     }
 }

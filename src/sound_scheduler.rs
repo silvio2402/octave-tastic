@@ -9,6 +9,8 @@ impl SoundScheduler {
     pub fn handle_scheduled_sound(play_msg: PlaySound) {
         thread::spawn(move || {
             let PlaySound {
+                channels,
+                sample_rate,
                 sound_data,
                 timestamp,
             } = play_msg;
@@ -28,7 +30,7 @@ impl SoundScheduler {
             }
             sleep(Duration::from_micros(wait as u64));
             println!("Playing sound...");
-            SoundPlayer::play_sound(sound_data);
+            SoundPlayer::play_sound(channels, sample_rate, sound_data);
         });
     }
 }
