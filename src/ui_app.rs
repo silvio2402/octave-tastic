@@ -1,11 +1,9 @@
 use eframe::egui;
 use std::path::PathBuf;
-use egui_file_dialog::FileDialog;
-
+use rfd::FileDialog;
 use crate::dispatcher::Dispatcher;
 
 pub struct UIApp {
-    file_dialog: FileDialog,
     picked_file: Option<PathBuf>,            
     addresses: Vec<String>,
 }
@@ -13,7 +11,6 @@ pub struct UIApp {
 impl Default for UIApp {
     fn default() -> Self {
         Self {
-            file_dialog: FileDialog::new(),
             picked_file: None,
             addresses: Vec::new(),
         }
@@ -52,13 +49,11 @@ impl eframe::App for UIApp {
             ui.separator();
 
            if ui.button("Pick file").clicked() {
-                self.file_dialog.pick_file();
+                if let Some(file) = FileDialog::new().set_directory("/").pick_file() {
+                    self.picked_file = Some(file);
+                }
             }
             ui.label(format!("Picked file: {:?}", self.picked_file));
-            self.file_dialog.update(ctx);
-            if let Some(path) = self.file_dialog.take_picked() {
-                self.picked_file = Some(path.to_path_buf());
-            }
             ui.separator();
 
             if ui.button("Play sound").clicked() {

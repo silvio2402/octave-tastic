@@ -11,3 +11,4 @@ eframe = "0.30.0"
 egui_extras = { version = "0.30.0", features = ["all_loaders"] }
 egui = { version = "0.14", features = ["default"] }
 egui-file-dialog = "0.8.0"
+rfd = "0.15.2"
