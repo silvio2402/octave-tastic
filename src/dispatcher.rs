@@ -1,5 +1,6 @@
 use std::io::BufReader;
 use std::net::TcpStream;
+use std::thread;
 use std::time::{Duration, SystemTime};
 use std::{fs::File, io::Write};
 
@@ -34,27 +35,31 @@ impl Dispatcher {
                 continue;
             }
 
-            let mut sock = TcpStream::connect(addr).expect("Failed to connect");
+            let source = source.clone();
 
-            while offset < duration {
-                let sound_data = source
-                    .clone()
-                    .skip_duration(offset)
-                    .take_duration(chunk_len)
-                    .collect::<Vec<i16>>();
+            thread::spawn(move || {
+                let mut sock = TcpStream::connect(addr).expect("Failed to connect");
 
-                offset += chunk_len;
+                while offset < duration {
+                    let sound_data = source
+                        .clone()
+                        .skip_duration(offset)
+                        .take_duration(chunk_len)
+                        .collect::<Vec<i16>>();
 
-                let msg = Message::PlaySound(PlaySound {
-                    timestamp: (now + offset).as_micros(),
-                    channels: channels,
-                    sample_rate: sample_rate,
-                    sound_data: sound_data,
-                });
+                    offset += chunk_len;
 
-                let buf = bincode::serialize(&msg).expect("Failed to serialize");
-                sock.write_all(&buf).unwrap();
-            }
+                    let msg = Message::PlaySound(PlaySound {
+                        timestamp: (now + offset).as_micros(),
+                        channels: channels,
+                        sample_rate: sample_rate,
+                        sound_data: sound_data,
+                    });
+
+                    let buf = bincode::serialize(&msg).expect("Failed to serialize");
+                    sock.write_all(&buf).unwrap();
+                }
+            });
         }
     }
 }

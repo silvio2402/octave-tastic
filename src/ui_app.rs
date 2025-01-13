@@ -46,15 +46,22 @@ impl eframe::App for UIApp {
             if ui.button("Add address").clicked() {
                 self.addresses.push("localhost:3000".to_owned());
             }
+            ui.add_space(25.0);
             ui.separator();
+            ui.add_space(25.0);
 
            if ui.button("Pick file").clicked() {
-                if let Some(file) = FileDialog::new().set_directory("/").pick_file() {
-                    self.picked_file = Some(file);
+                let file = FileDialog::new().pick_file();
+                if !file.is_none() {
+                    self.picked_file = file;
                 }
             }
+            
             ui.label(format!("Picked file: {:?}", self.picked_file));
+
+            ui.add_space(25.0);
             ui.separator();
+            ui.add_space(25.0); 
 
             if ui.button("Play sound").clicked() {
                 if let Some(path) = &self.picked_file {
