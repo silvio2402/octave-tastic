@@ -14,7 +14,7 @@ impl Dispatcher {
         data
     }
 
-    pub fn handle_dispatch_sample(addr: String, sound_path: String) {
+    pub fn handle_dispatch_sample(addrs: Vec<String>, sound_path: String) {
         let now = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap()
@@ -25,8 +25,17 @@ impl Dispatcher {
             timestamp: timestamp,
             sound_data: sound_data,
         });
-        let mut sock = TcpStream::connect(addr).expect("Failed to connect");
-        let buf = bincode::serialize(&msg).expect("Failed to serialize");
-        sock.write_all(&buf).unwrap();
+        for addr in addrs {
+            if addr.is_empty() {
+                continue;
+                
+            } else {
+                let mut sock = TcpStream::connect(addr).expect("Failed to connect");
+                let buf = bincode::serialize(&msg).expect("Failed to serialize");
+                sock.write_all(&buf).unwrap();
+            }
+            
+        }
+        
     }
 }
