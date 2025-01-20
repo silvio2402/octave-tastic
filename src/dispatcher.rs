@@ -1,8 +1,8 @@
-use std::io::BufReader;
-use std::net::TcpStream;
+use std::fs::File;
+use std::io::{BufReader, Read};
+use std::net::UdpSocket;
 use std::thread;
 use std::time::{Duration, SystemTime};
-use std::{fs::File, io::Write};
 
 use rodio::{Decoder, Source};
 
@@ -26,7 +26,7 @@ impl Dispatcher {
         let channels = source.channels();
         let sample_rate = source.sample_rate();
         let duration = source.total_duration().unwrap();
-        let chunk_len = Duration::from_secs(1);
+        let chunk_len = Duration::from_millis(200);
 
         let mut offset = Duration::from_secs(0);
 
@@ -38,7 +38,8 @@ impl Dispatcher {
             let source = source.clone();
 
             thread::spawn(move || {
-                let mut sock = TcpStream::connect(addr).expect("Failed to connect");
+                let sock = UdpSocket::bind("0.0.0.0:0").expect("Failed to bind");
+                sock.connect(addr.clone()).expect("Failed to connect");
 
                 while offset < duration {
                     let sound_data = source
@@ -57,7 +58,7 @@ impl Dispatcher {
                     });
 
                     let buf = bincode::serialize(&msg).expect("Failed to serialize");
-                    sock.write_all(&buf).unwrap();
+                    sock.send(&buf).expect("Failed to send");
                 }
             });
         }
