@@ -22,4 +22,5 @@ We adhered to the YAGNI (You Ain’t Gonna Need It) principle throughout the dev
 
 ## Actual structure
 
-![Syncaud](https://github.com/user-attachments/assets/97cc57de-a53d-48e3-b09e-8057bba05bac)
+![Syncaud(2)](https://github.com/user-attachments/assets/0b610dec-5589-40e5-82c3-34384649bd61)
+
