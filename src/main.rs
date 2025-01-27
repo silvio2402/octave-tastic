@@ -20,7 +20,21 @@ fn main() -> eframe::Result {
     };
 
     thread::spawn(move || {
-        ClientHandler::listen();
+        let result = ClientHandler::listen(3000);
+        match result {
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("Failed to bind: {}", e.message);
+                // Try with port 3001
+                let result = ClientHandler::listen(3001);
+                match result {
+                    Ok(_) => {}
+                    Err(e) => {
+                        eprintln!("Failed to bind again: {}", e.message);
+                    }
+                }
+            }
+        }
     });
 
     eframe::run_native(

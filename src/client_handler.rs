@@ -2,6 +2,12 @@ use crate::protocol::Message;
 use crate::sound_scheduler::SoundScheduler;
 use std::net::UdpSocket;
 
+pub struct BindError {
+    pub message: String,
+}
+
+type Result<T> = std::result::Result<T, BindError>;
+
 pub struct ClientHandler;
 
 impl ClientHandler {
@@ -13,8 +19,17 @@ impl ClientHandler {
         }
     }
 
-    pub fn listen() {
-        let socket = UdpSocket::bind("0.0.0.0:3000").expect("Could not bind to address");
+    pub fn listen(port: u16) -> Result<()> {
+        let bind_addr = format!("0.0.0.0:{}", port);
+        let socket = UdpSocket::bind(bind_addr);
+        let socket = match socket {
+            Ok(s) => s,
+            Err(e) => {
+                return Err(BindError {
+                    message: e.to_string(),
+                });
+            }
+        };
 
         println!("Listening on {}", socket.local_addr().unwrap());
 
