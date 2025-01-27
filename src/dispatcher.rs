@@ -8,20 +8,26 @@ use rodio::{Decoder, Source};
 
 use crate::protocol::{Message, PlaySound};
 
-pub struct Dispatcher;
+pub trait Dispatcher {
+    fn handle_dispatch(addrs: Vec<String>, sound_path: String);
+}
 
-impl Dispatcher {
+pub struct NetworkDispatcher;
+
+impl NetworkDispatcher {
     fn load_sound(path: String) -> Decoder<BufReader<File>> {
         let file = BufReader::new(File::open(path).unwrap());
         Decoder::new(file).unwrap()
     }
+}
 
-    pub fn handle_dispatch_sample(addrs: Vec<String>, sound_path: String) {
+impl Dispatcher for NetworkDispatcher {
+    fn handle_dispatch(addrs: Vec<String>, sound_path: String) {
         let now = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap();
 
-        let source = Dispatcher::load_sound(sound_path).buffered();
+        let source = NetworkDispatcher::load_sound(sound_path).buffered();
 
         let channels = source.channels();
         let sample_rate = source.sample_rate();

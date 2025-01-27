@@ -8,9 +8,7 @@ pub struct BindError {
 
 type Result<T> = std::result::Result<T, BindError>;
 
-pub struct ClientHandler;
-
-impl ClientHandler {
+pub trait ClientHandler {
     fn handle_message(msg: Message) {
         match msg {
             Message::PlaySound(play_sound) => {
@@ -18,8 +16,18 @@ impl ClientHandler {
             }
         }
     }
+}
 
-    pub fn listen(port: u16) -> Result<()> {
+pub trait Listener : ClientHandler {
+    fn listen(port: u16) -> Result<()>;
+}
+
+pub struct NetworkListener;
+
+impl ClientHandler for NetworkListener {}
+
+impl Listener for NetworkListener {
+    fn listen(port: u16) -> Result<()> {
         let bind_addr = format!("0.0.0.0:{}", port);
         let socket = UdpSocket::bind(bind_addr);
         let socket = match socket {
@@ -39,7 +47,7 @@ impl ClientHandler {
             println!("Received {} bytes from {}", amt, src);
             let data = &mut data[..amt];
             let msg = bincode::deserialize::<Message>(data).expect("Failed to deserialize");
-            ClientHandler::handle_message(msg);
+            NetworkListener::handle_message(msg);
         }
     }
 }

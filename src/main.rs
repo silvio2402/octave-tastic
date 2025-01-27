@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use client_handler::ClientHandler;
+use client_handler::{Listener, NetworkListener};
 use std::thread;
 use ui_app::UIApp;
 
@@ -20,13 +20,13 @@ fn main() -> eframe::Result {
     };
 
     thread::spawn(move || {
-        let result = ClientHandler::listen(3000);
+        let result = NetworkListener::listen(3000);
         match result {
             Ok(_) => {}
             Err(e) => {
                 eprintln!("Failed to bind: {}", e.message);
                 // Try with port 3001
-                let result = ClientHandler::listen(3001);
+                let result = NetworkListener::listen(3001);
                 match result {
                     Ok(_) => {}
                     Err(e) => {
