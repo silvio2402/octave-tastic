@@ -8,7 +8,7 @@
 
 ## Design Pattern
 
-We adhered to the YAGNI (You Ain’t Gonna Need It) principle throughout the development process to avoid unnecessary complexity and over-engineering. By focusing only on features and functionality that were essential to the immediate requirements, we streamlined our implementation and kept the codebase lean. This approach not only reduced development time and effort but also ensured that the code was easier to maintain, understand, and optimize. As a result, we achieved maximum efficiency while maintaining a minimal and effective code structure tailored to meet the project’s specific needs.
+In our code we adhered to the Strategy Design Pattern as described [here](https://rust-unofficial.github.io/patterns/patterns/behavioural/strategy.html). For example, the ClientHandler trait acts as the strategy interface and the NetworkListener implements the strategy via the trait. This means that in the future, this strategy could be replaced to allow for a different communication medium, e.g. Serial.
 
 ## Featurelist
 
