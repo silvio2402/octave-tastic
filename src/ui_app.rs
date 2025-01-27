@@ -77,7 +77,11 @@ impl eframe::App for UIApp {
             }
 
             // Displaying the picked file path
-            ui.label(format!("Picked file: {:?}", self.picked_file));
+            let picked_file_label = match &self.picked_file {
+                Some(path) => format!("Picked file: {:?}", path),
+                None => "No file picked".to_owned(),
+            };
+            ui.label(picked_file_label);
 
             ui.add_space(25.0); // Adding space in the UI
             ui.separator(); // Adding a separator line
