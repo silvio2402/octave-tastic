@@ -1,4 +1,4 @@
-use crate::dispatcher::Dispatcher;
+use crate::dispatcher::{Dispatcher, NetworkDispatcher};
 use eframe::egui;
 use rfd::FileDialog;
 use std::path::PathBuf;
@@ -30,7 +30,7 @@ impl eframe::App for UIApp {
                     ui.text_edit_singleline(address);
                     if ui.button("Play sound").clicked() {
                         if let Some(path) = &self.picked_file {
-                            Dispatcher::handle_dispatch_sample(
+                            NetworkDispatcher::handle_dispatch(
                                 vec![address.clone()],
                                 path.to_str().unwrap().to_owned(),
                             );
@@ -66,7 +66,7 @@ impl eframe::App for UIApp {
 
             if ui.button("Play sound").clicked() {
                 if let Some(path) = &self.picked_file {
-                    Dispatcher::handle_dispatch_sample(
+                    NetworkDispatcher::handle_dispatch(
                         self.addresses.clone(),
                         path.to_str().unwrap().to_owned(),
                     );
