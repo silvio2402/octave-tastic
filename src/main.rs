@@ -1,4 +1,5 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // Hide console window on Windows in release mode
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+// Hide console window on Windows in release mode
 
 // Import necessary modules and crates
 use client_handler::{Listener, NetworkListener};
@@ -18,7 +19,8 @@ mod ui_app;
 fn main() -> eframe::Result {
     // Define options for the eframe application
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([700.0, 400.0]), // Set initial window size
+        // Set initial window size
+        viewport: egui::ViewportBuilder::default().with_inner_size([700.0, 400.0]),
         ..Default::default()
     };
 
@@ -29,13 +31,15 @@ fn main() -> eframe::Result {
         match result {
             Ok(_) => {}
             Err(e) => {
-                eprintln!("Failed to bind: {}", e.message); // Print error message if binding fails
-                                                            // Try with port 3001 if port 3000 fails
+                // Print error message if binding fails
+                eprintln!("Failed to bind: {}", e.message);
+                // Try with port 3001 if port 3000 fails
                 let result = NetworkListener::listen(3001);
                 match result {
                     Ok(_) => {}
                     Err(e) => {
-                        eprintln!("Failed to bind again: {}", e.message); // Print error message if binding fails again
+                        // Print error message if binding fails again
+                        eprintln!("Failed to bind again: {}", e.message);
                     }
                 }
             }
@@ -44,13 +48,17 @@ fn main() -> eframe::Result {
 
     // Run the eframe application
     eframe::run_native(
-        "My egui App", // Application title
-        options,       // Application options
+        // Application title
+        "My egui App",
+        // Application options
+        options,
         Box::new(|cc| {
             // This gives us image support:
-            egui_extras::install_image_loaders(&cc.egui_ctx); // Install image loaders for egui context
+            // Install image loaders for egui context
+            egui_extras::install_image_loaders(&cc.egui_ctx);
 
-            Ok(Box::<UIApp>::default()) // Initialize the UI application
+            // Initialize the UI application
+            Ok(Box::<UIApp>::default())
         }),
     )
 }

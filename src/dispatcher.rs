@@ -20,8 +20,10 @@ pub struct NetworkDispatcher;
 impl NetworkDispatcher {
     // Load a sound file and return a Decoder
     fn load_sound(path: String) -> Decoder<BufReader<File>> {
-        let file = BufReader::new(File::open(path).unwrap()); // Open the file
-        Decoder::new(file).unwrap() // Decode the file
+        // Open the file
+        let file = BufReader::new(File::open(path).unwrap());
+        // Decode the file
+        Decoder::new(file).unwrap()
     }
 }
 
@@ -39,23 +41,28 @@ impl Dispatcher for NetworkDispatcher {
         let channels = source.channels();
         let sample_rate = source.sample_rate();
         let duration = source.total_duration().unwrap();
-        let chunk_len = Duration::from_millis(200); // Length of each chunk to send
+        // Length of each chunk to send
+        let chunk_len = Duration::from_millis(200);
 
-        let mut offset = Duration::from_secs(0); // Initial offset
+        // Initial offset
+        let mut offset = Duration::from_secs(0);
 
         // Iterate over each address
         for addr in addrs {
+            // Skip empty addresses
             if addr.is_empty() {
-                continue; // Skip empty addresses
+                continue;
             }
 
-            let source = source.clone(); // Clone the source for each thread
+            // Clone the source for each thread
+            let source = source.clone();
 
             // Spawn a new thread for each address
             thread::spawn(move || {
                 // Bind to a local UDP socket
                 let sock = UdpSocket::bind("0.0.0.0:0").expect("Failed to bind");
-                sock.connect(addr.clone()).expect("Failed to connect"); // Connect to the address
+                // Connect to the address
+                sock.connect(addr.clone()).expect("Failed to connect");
 
                 // Loop until the entire duration is covered
                 while offset < duration {
@@ -66,11 +73,13 @@ impl Dispatcher for NetworkDispatcher {
                         .take_duration(chunk_len)
                         .collect::<Vec<i16>>();
 
-                    offset += chunk_len; // Update the offset
+                    // Update the offset
+                    offset += chunk_len;
 
                     // Create a PlaySound message
                     let msg = Message::PlaySound(PlaySound {
-                        timestamp: (now + offset).as_micros(), // Timestamp for synchronization
+                        // Timestamp for synchronization
+                        timestamp: (now + offset).as_micros(),
                         channels: channels,
                         sample_rate: sample_rate,
                         sound_data: sound_data,

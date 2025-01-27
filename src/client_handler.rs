@@ -41,10 +41,11 @@ impl Listener for NetworkListener {
     fn listen(port: u16) -> Result<()> {
         // Create the bind address string
         let bind_addr = format!("0.0.0.0:{}", port);
+
         // Attempt to bind the UDP socket to the address
         let socket = UdpSocket::bind(bind_addr);
         let socket = match socket {
-            Ok(s) => s, // If successful, use the socket
+            Ok(s) => s,
             Err(e) => {
                 // If there's an error, return a BindError
                 return Err(BindError {
@@ -60,14 +61,19 @@ impl Listener for NetworkListener {
         loop {
             // Buffer to store incoming data
             let mut data = [0; 1_048_576];
+
             // Receive data from the socket
             let (amt, src) = socket.recv_from(&mut data).expect("Didn't receive data");
+
             // Print the amount of data received and the source address
             println!("Received {} bytes from {}", amt, src);
+
             // Slice the buffer to the actual amount of data received
             let data = &mut data[..amt];
+
             // Deserialize the data into a Message
             let msg = bincode::deserialize::<Message>(data).expect("Failed to deserialize");
+
             // Handle the deserialized message
             NetworkListener::handle_message(msg);
         }
